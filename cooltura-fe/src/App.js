@@ -1,6 +1,10 @@
 import React, { Component } from 'react';
 import './App.css';
-import { ToggleSwitch, Box, Row, Col } from './component';
+import { ToggleSwitch } from './component';
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/AppBar';
+import Grid from '@material-ui/core/Grid';
+import Schedule from './ui/Schedule';
 import { subscribeToFogger, emitFogger, connectionSocket } from './api';
 
 class App extends Component {
@@ -31,29 +35,7 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <Box
-          color="red"
-          background="red"
-        >
-          <Row>
-            {/* <Col md="4" xs="12"> */}
-              <p>Test</p>
-            {/* </Col> */}
-            {/* <Col md="4" xs="12"> */}
-              <ToggleSwitch 
-                checked={this.state.inputChecked}
-                onChange={this.toggleChange}
-              />
-            {/* </Col> */}
-            {/* <Col md="4" xs="12"> */}
-              <input 
-                type="checkbox"
-                checked={this.state.inputChecked}
-                onChange={this.toggleChange}
-              />
-            {/* </Col> */}
-          </Row>
-        </Box>
+        <Schedule />
       </div>
     );
   }

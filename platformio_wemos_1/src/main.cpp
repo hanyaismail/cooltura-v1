@@ -4,8 +4,8 @@
 
 // Update these with values suitable for your network.
 
-const char* ssid = "Ismail";
-const char* password = "220a1995";
+const char* ssid = "Jangan Ngambil";
+const char* password = "janganmencuri";
 const char* mqtt_server = "iot.eclipse.org";
 
 WiFiClient espClient;
@@ -13,6 +13,8 @@ PubSubClient client(espClient);
 long lastMsg = 0;
 char msg[50];
 int value = 0;
+int FOGGER_1 = 0; //D3
+int LIGHT_1 = 5; //D1
 
 void setup_wifi() {
 
@@ -44,17 +46,42 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) {
     Serial.print((char)payload[i]);
   }
-  Serial.println();
 
-  // Switch on the LED if an 1 was received as first character
-  if ((char)payload[0] == '1') {
-    digitalWrite(LED_BUILTIN, LOW);   // Turn the LED on (Note that LOW is the voltage level
-    // but actually the LED is on; this is because
-    // it is active low on the ESP-01)
-  } else {
-    digitalWrite(LED_BUILTIN, HIGH);  // Turn the LED off by making the voltage HIGH
+  String topicString = String(topic);
+  Serial.println();
+  if(topicString == "initialState_ismail220a") {
+    Serial.println("cool");
+    int fogger1state = digitalRead(FOGGER_1);
+    String stringFogger1State = String(fogger1state);
+
+    int light1state = digitalRead(LIGHT_1);
+    String stringLight1State = String(light1state);
+
+    client.publish("initialStateOut_ismail220a/fogger/1", (char*)stringFogger1State.c_str());
+    client.publish("initialStateOut_ismail220a/light/1", (char*)stringLight1State.c_str());
   }
 
+  if(topicString == "inTopic_ismail220a/fogger/1") {
+    // Switch on the LED if an 1 was received as first character
+    if ((char)payload[0] == '1') {
+      digitalWrite(FOGGER_1, LOW);   // Turn the LED on (Note that LOW is the voltage level
+      // but actually the LED is on; this is because
+      // it is active low on the ESP-01)
+    } else {
+      digitalWrite(FOGGER_1, HIGH);  // Turn  the LED off by making the voltage HIGH
+    }
+  }
+
+  if(topicString == "inTopic_ismail220a/light/1") {
+    // Switch on the LED if an 1 was received as first character
+    if ((char)payload[0] == '1') {
+      digitalWrite(LIGHT_1, LOW);   // Turn the LED on (Note that LOW is the voltage level
+      // but actually the LED is on; this is because
+      // it is active low on the ESP-01)
+    } else {
+      digitalWrite(LIGHT_1, HIGH);  // Turn  the LED off by making the voltage HIGH
+    }
+  }
 }
 
 void reconnect() {
@@ -68,9 +95,13 @@ void reconnect() {
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("outTopic_ismail220a", "hello world from Ismail");
+      // int state = digitalRead(LED_BUILTIN);
+      // String stringState = String(state);
+      // client.publish("outTopic_ismail220a", (char*)stringState.c_str());
       // ... and resubscribe
-      client.subscribe("inTopic_ismail220a");
+      client.subscribe("inTopic_ismail220a/fogger/1");
+      client.subscribe("inTopic_ismail220a/light/1");
+      client.subscribe("initialState_ismail220a");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -82,7 +113,8 @@ void reconnect() {
 }
 
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(FOGGER_1, OUTPUT);     // Initialize the LED_BUILTIN pin as an output
+  pinMode(LIGHT_1, OUTPUT);
   Serial.begin(115200);
   setup_wifi();
   client.setServer(mqtt_server, 1883);

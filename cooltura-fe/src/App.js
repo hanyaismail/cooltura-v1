@@ -6,6 +6,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Grid from '@material-ui/core/Grid';
 import Schedule from './ui/Schedule';
 import { subscribeToFogger, emitFogger, connectionSocket } from './api';
+import MobileView from './ui/mobile/MobileView';
+import WebView from './ui/web/WebView';
 
 class App extends Component {
   constructor(props) {
@@ -33,10 +35,13 @@ class App extends Component {
   }
 
   render() {
+    const isMobile = window.innerWidth <= 500;
+
     return (
       <div className="App">
-        <Schedule />
-        <Schedule />
+        {/* <Schedule /> */}
+        {/* <Schedule /> */}
+        {isMobile ? <MobileView /> : <WebView />}
       </div>
     );
   }
